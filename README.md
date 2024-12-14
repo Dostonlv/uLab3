@@ -143,3 +143,109 @@ you can see the data models swagger-jsdoc
 GET /api-docs
 ```
 
+>[!WARNING]
+> MongoDB Aggregation Examples
+
+### Product Report Aggregation
+
+```
+GET /api/products/report?startDate=2024-01-01&endDate=2024-01-31
+```
+Returns statistics about products grouped by category.
+
+
+``` javascript
+// Group products by category with statistics
+const pipeline = [
+// Match by date range (optional)
+{
+$match: {
+created_at: {
+$gte: new Date("2024-01-01"),
+$lte: new Date("2024-12-31")
+}
+}
+},
+// Group by category
+{
+$group: {
+id: '$category',
+totalProducts: { $sum: 1 },
+averagePrice: { $avg: '$price' },
+minPrice: { $min: '$price' },
+maxPrice: { $max: '$price' }
+}
+},
+// Sort by total products
+{
+$sort: {
+totalProducts: -1
+}
+},
+// Format output
+{
+$project: {
+id: 0,
+category: '$id',
+totalProducts: 1,
+averagePrice: { $round: ['$averagePrice', 2] },
+priceRange: {
+min: '$minPrice',
+max: '$maxPrice'
+}
+}
+}
+]
+```
+
+
+### Order Report Aggregation
+
+``` javascript
+javascript
+// Group orders by payment method with product details
+const pipeline = [
+// Match by date range (optional)
+{
+$match: {
+created_at: {
+$gte: new Date("2024-01-01"),
+$lte: new Date("2024-12-31")
+}
+}
+},
+// Join with products collection
+{
+$lookup: {
+from: 'products',
+localField: 'product_ids',
+foreignField: 'id',
+as: 'products'
+}
+},
+// Group by payment method
+{
+$group: {
+id: '$payment_method',
+totalRevenue: { $sum: '$total_price' },
+totalOrders: { $count: {} },
+averageOrderValue: { $avg: '$total_price' }
+}
+},
+// Sort by total revenue
+{
+$sort: {
+totalRevenue: -1
+}
+}
+]
+```
+
+
+> [!NOTE]
+> These aggregation pipelines demonstrate:
+> - `$match`: Filter documents by conditions
+> - `$group`: Group documents by a field with aggregations
+> - `$lookup`: Join with other collections
+> - `$project`: Shape the output format
+> - `$sort`: Sort the results
