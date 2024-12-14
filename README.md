@@ -117,13 +117,13 @@ The API supports the following payment methods:
 
 ## Error Handling
 
-The API uses standard HTTP status codes:
-
-- 200: Success
-- 201: Created
-- 400: Bad Request
-- 404: Not Found
-- 500: Server Error
+> [!Note]
+> The API uses standard HTTP status codes:
+> - 200: Success
+> - 201: Created
+> - 400: Bad Request
+> - 404: Not Found
+> - 500: Server Error
 
 Error responses include a message explaining what went wrong:
 
